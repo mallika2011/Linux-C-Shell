@@ -12,6 +12,7 @@ void fore(char **token)
     else if(pid==0) 
     {
         int f=execvp(token[0],token);
+        // printf("%s %s %s\n", token[0], token[1], token[2]);
         if(f<0)
         {
             perror("Error: exec failed\n");
