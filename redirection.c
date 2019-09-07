@@ -23,19 +23,18 @@ void both(char com[], ll app)
 
     if (k == 2)
     {
-        printf("Yes\n");
         strcpy(to, command[1]); //OUTPUT FILEEEEE
         temp1[0] = strtok(to, " \t\n\r");
         strcpy(output_file, temp1[0]);
     }
-    printf("output file %s\n", output_file);
+    // printf("output file %s\n", output_file);
 
     k = 0;
-    temp2[0] = strtok(command[0], " <");
+    temp2[0] = strtok(command[0], "<");
     while (temp2[k] != NULL)
     {
         k++;
-        temp2[k] = strtok(NULL, " <");
+        temp2[k] = strtok(NULL, "<");
     }
     if (k == 2)
     {
@@ -43,7 +42,7 @@ void both(char com[], ll app)
         temp3[0] = strtok(input_file, " \t\n\r");
         strcpy(input_file, temp3[0]);
     }
-    printf("input file = %s\nk=%d\n", input_file, k);
+    // printf("input file = %s\nk=%d\n", input_file, k);
     k = 0;
     from[0] = strtok(temp2[0], " \t\n\r");
     while (from[k] != NULL)
@@ -160,27 +159,18 @@ void both(char com[], ll app)
 
 void redirection(char *token[], ll k, char list_com[], int redflag)
 {
-    // ll app = 0, inp = 0, out = 0, a = 0;
-    // for (ll i = 0; i < k; i++)
-    // {
-    //     if (strcmp(token[i], ">") == 0)
-    //         out += 1;
-    //     else if (strcmp(token[i], "<") == 0)
-    //         inp += 1;
-    //     else if (strcmp(token[i], ">>") == 0)
-    //     {
-    //         app = 1;
-    //         a += 1;
-    //     }
-    // }
-
-    // if ((inp == 1 && out == 1) || (inp == 1 && a == 1))
-    // {
-    //     both(list_com, app);
-    // }
-    // else if (inp == 1)
-    //     input_redirect(list_com);
-    // else if (out == 1 || a == 1)
-    //     output_redirect(list_com, app);
-    both(list_com, 0);
+    ll app = 0, inp = 0, out = 0, a = 0;
+    for (ll i = 0; i < k; i++)
+    {
+        if (strcmp(token[i], ">") == 0)
+            out += 1;
+        else if (strcmp(token[i], "<") == 0)
+            inp += 1;
+        else if (strcmp(token[i], ">>") == 0)
+        {
+            app = 1;
+            a += 1;
+        }
+    }
+    both(list_com, app);
 }
