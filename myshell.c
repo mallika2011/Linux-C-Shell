@@ -306,10 +306,7 @@ void loop(void)
         }
 
         else if(strcmp(token[0],"jobs")==0)
-        {
-          print_jobs();
-        }
-
+          alljobs();
         else
           // printf("myshell: command not found: %s\n", token[0]);
           fore(token);

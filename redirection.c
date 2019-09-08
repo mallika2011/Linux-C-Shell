@@ -2,13 +2,83 @@
 
 int status;
 
+void choice(int fds[], char *from[], int k, int oldin, int oldout)
+{
+    // dup2(fds[0], 0);
+
+    // printf("ENTERED CHOICE *****************\n");
+
+    //---------------------------
+    if (strcmp(from[k - 1], "&") == 0) // FOR BACKGROUND PROCESSES
+    {
+        // printf("entered back\n");
+        from[k - 1] = NULL;
+        back(from);
+    }
+    else if (from[0][0] == '.') // FOR EXECUTABLES
+        fore(from);
+    else if (strcmp(from[0], "pwd") == 0) //COMMAND : PWD
+        pwd();
+    else if (strcmp(from[0], "cd") == 0) //COMMAND : CD
+    {
+        if (k > 2)
+            perror("myshell: Error: Too many arguments\n");
+        if (k > 1)
+            cd(from[1]);
+        else
+            chdir(pseudo_home);
+    }
+
+    else if (strcmp(from[0], "echo") == 0) //COMMAND : ECHO
+    {
+        char st[10000] = "";
+        for (ll o = 1; o <= k - 1; o++)
+        {
+            strcat(st, from[o]);
+            strcat(st, " ");
+        }
+        echo(st);
+    }
+
+    else if (strcmp(from[0], "ls") == 0) // COMMAND :LS
+    {
+        printf("entere dyour ls\n");
+        ls(cwd, k, from);
+    }
+    else if (strcmp(from[0], "pinfo") == 0) //COMMAND :PINFO
+        pinfo(k, from);
+    else if (strcmp(from[0], "vi") == 0 || strcmp(from[0], "emacs") == 0 || strcmp(from[0], "gedit") == 0) // COMMAND : VI, EMACS, GEDIT FOREGROUND
+        fore(from);
+    else if (strcmp(from[0], "code") == 0) // TRIAL COMMAND FOR VSCODE
+        fore(from);
+    else if (strcmp(from[0], "history") == 0) //HISTORY
+    {
+        history_print();
+        his_check(from[0]);
+    }
+    else if (strcmp(from[0], "jobs") == 0)
+        alljobs();
+    else
+    {
+        int z = execvp(from[0], from);
+        if (z < 0)
+        {
+            perror("myshell:Error\n");
+            dup2(oldout, 1);
+            close(fds[0]);
+        }
+    }
+    // dup2(oldin, 0);
+}
+
 void both(char com[], ll app)
 {
     char *command[100000], to[10000], *from[10000], *temp1[100000], *temp2[100000], *temp3[100000], input_file[100000], delim[10], output_file[100000];
-    strcpy(output_file,"");
-    strcpy(input_file,"");
+    strcpy(output_file, "");
+    strcpy(input_file, "");
     int fds[10];
-    for(ll i=0; i<10;i++) fds[i]=-1;
+    for (ll i = 0; i < 10; i++)
+        fds[i] = -1;
     ll k = 0;
     if (app == 1)
         strcpy(delim, ">>");
@@ -70,9 +140,10 @@ void both(char com[], ll app)
             else
             {
                 dup2(fds[0], 0);
-                int z = execvp(from[0], from);
-                if (z < 0)
-                    perror("myshell:Error\n");
+                // int z = execvp(from[0], from);
+                // if (z < 0)
+                //     perror("myshell:Error\n");
+                choice(fds,from,k,oldin,-1);
                 dup2(oldin, 0);
             }
             exit(0);
@@ -95,13 +166,17 @@ void both(char com[], ll app)
 
         if (pid == 0)
         {
-            int z = execvp(from[0], from);
-            if (z < 0)
-            {
-                perror("myshell:Error\n");
-                dup2(oldout, 1);
-                close(fds[0]);
-            }
+            // int z = execvp(from[0], from);
+            // if (z < 0)
+            // {
+            //     perror("myshell:Error\n");
+            //     dup2(oldout, 1);
+            //     close(fds[0]);
+            // }
+            choice(fds,from,k,-1,oldout);
+            dup2(oldout, 1);
+            close(fds[0]);
+
             exit(0);
         }
         else
@@ -135,13 +210,7 @@ void both(char com[], ll app)
             else
             {
                 dup2(fds[0], 0);
-                int z = execvp(from[0], from);
-                if (z < 0)
-                {
-                    perror("myshell:Error\n");
-                    dup2(oldout, 1);
-                    close(fds[0]);
-                }
+                choice(fds, from, k, oldin, oldout);
                 dup2(oldin, 0);
             }
             exit(0);

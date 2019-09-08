@@ -43,7 +43,7 @@ struct jobs job_arr[100000];
 /*REDIRECTION*/ void redirection(char *token[], ll k, char list_com[], int redflag);
 /*PIPING*/      int pipecheck();
 /*PIPING*/      void piping(char *commands[], ll k);
-/*JOB PRINT*/   void print_jobs();
+/*JOB PRINT*/   void alljobs();
 void history_print();
 int his_check(char new[]);
 void his_load(ll l, ll r);
