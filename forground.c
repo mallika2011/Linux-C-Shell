@@ -1,19 +1,18 @@
 #include "headers.h"
 
-
 void fore(char **token)
 {
-    pid_t pid; 
+    pid_t pid;
 
-    pid=fork();
+    pid = fork();
 
-    if(pid<0)
+    if (pid < 0)
         perror("Error: Fork Failed\n");
-    else if(pid==0) 
+    else if (pid == 0)
     {
-        int f=execvp(token[0],token);
+        int f = execvp(token[0], token);
         // printf("%s %s %s\n", token[0], token[1], token[2]);
-        if(f<0)
+        if (f < 0)
         {
             perror("Error: exec failed\n");
             printf("myshell: command not found: %s\n", token[0]);
@@ -22,9 +21,10 @@ void fore(char **token)
     }
     else
     {
-        wait(NULL);    
-        // while (wait(&status) != pid)       /* wait for completion  */
-        //        ;
+        int status;
+        // wait(NULL);
+        while (wait(&status) != pid) /* wait for completion  */
+            ;
     }
-    
+
 }

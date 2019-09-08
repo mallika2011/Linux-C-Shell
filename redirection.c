@@ -88,9 +88,9 @@ void both(char com[], ll app)
         int pid = fork();
 
         if (app == 0)
-            fds[0] = open(output_file, O_WRONLY | O_TRUNC | O_CREAT, 0755);
+            fds[0] = open(output_file, O_WRONLY | O_TRUNC | O_CREAT, 0644);
         else if (app == 1)
-            fds[0] = open(output_file, O_APPEND | O_WRONLY | O_CREAT, 0755);
+            fds[0] = open(output_file, O_APPEND | O_WRONLY | O_CREAT, 0644);
         dup2(fds[0], 1);
 
         if (pid == 0)
@@ -122,9 +122,9 @@ void both(char com[], ll app)
 
         fds[0] = open(input_file, O_RDONLY);
         if (app == 0)
-            fds[1] = open(output_file, O_WRONLY | O_TRUNC | O_CREAT, 0755);
+            fds[1] = open(output_file, O_WRONLY | O_TRUNC | O_CREAT, 0644);
         else if (app == 1)
-            fds[1] = open(output_file, O_APPEND | O_WRONLY | O_CREAT, 0755);
+            fds[1] = open(output_file, O_APPEND | O_WRONLY | O_CREAT, 0644);
         dup2(fds[1], 1);
         if (fds[0] < 0)
             perror("File doesn't exist\n");

@@ -24,6 +24,14 @@ int child_flag;
 int curid;
 char *token[100000];
 
+typedef struct jobs{
+    char name[10000];
+    pid_t pid;
+}job;
+
+ll job_count;
+struct jobs job_arr[100000];
+
 /*MAIN LOOP */  void loop(void);
 /*PWD */        void pwd();
 /*CD */         void cd(char path[]);
@@ -33,6 +41,9 @@ char *token[100000];
 /*FOREGROUND */ void fore(char *token[]);
 /*BACKGROUND */ void back(char *token[]);
 /*REDIRECTION*/ void redirection(char *token[], ll k, char list_com[], int redflag);
+/*PIPING*/      int pipecheck();
+/*PIPING*/      void piping(char *commands[], ll k);
+/*JOB PRINT*/   void print_jobs();
 void history_print();
 int his_check(char new[]);
 void his_load(ll l, ll r);

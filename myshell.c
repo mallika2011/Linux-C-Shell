@@ -3,10 +3,10 @@
 
 char prompt[200000] = "";
 char dir[100000];
-char *list_com[100000];
+char *list_com[100000], *temp[100000];
 int s, x = 0;
 ll ii = 0;
-ll l, r;
+ll l, r, myid, childid;
 
 void promptprint()
 {
@@ -70,21 +70,22 @@ void promptprint()
   printf("\033[0m");
 }
 
-void del_process(int pid_arr[], int id)
+void del_process(int id)
 {
-  for (ll i = 0; i <= curid; i++)
+  int flag=0;
+  for (ll i = 1; i <= job_count; i++)
   {
-    if (pid_arr[i] == id)
+    // printf("loop\n");
+    if (job_arr[i].pid == id)
     {
-      for (ll j = i; j < curid; j++)
-        pid_arr[j] = pid_arr[j + 1];
-      curid--;
-    }
-    else
-    {
-      printf("Error: no such process found\n");
+      flag=1;
+      for (ll j = i; j < job_count; j++)
+        job_arr[j] = job_arr[j + 1];
+      job_count--;
     }
   }
+  if(flag==0)
+    printf("Error: no such process found\n");
 }
 
 void done()
@@ -94,32 +95,68 @@ void done()
 
   p = waitpid(-1, &status, WNOHANG);
   // printf("Curid in loop = %d\n", curid);
-  for (ll z = 0; z <= curid; z++)
+  for (ll z = 1; z <= job_count; z++)
   {
-    // int status;
     if (p < 0)
     {
       perror("\nwaitpid failed\n");
     }
 
     const int exit = WEXITSTATUS(status);
-
-    if (WIFEXITED(status) && p == pid_arr[z])
+    if (WIFEXITED(status) && p == job_arr[z].pid)
     {
       if (exit == 0)
-        fprintf(stderr, "\n%s with pid %d exited normally\nExit status: %d\n", token[0], p, exit);
+        fprintf(stderr, "\nExitted normally with exit status: %d\n", exit);
       else
-        fprintf(stderr, "\n%s with pid %d exited abnormally\n", token[0], p);
+        fprintf(stderr, "\nExitted abnormally\n");
+
+      fprintf(stderr, "%s with pid %d: exited\n", token[0], p);
 
       promptprint();
 
       fflush(stdout);
-      del_process(pid_arr, p);
+      del_process(p);
     }
   }
 }
 
+// void ctrl_c(int signo)
+// {
+//     pid_t p = getpid();
+
+//     printf("myid = %d\nchildid = %d\n",p, childid);
+//     if (p != myid)
+//         return;
+//     printf("next step\n");
+//     if (childid != -1)
+//     {
+//       printf("Killing\n");
+//       kill(childid, SIGINT);
+//     }
+//     signal(SIGINT, ctrl_c);
+// }
+
+// void ctrl_z(int signo)
+// {
+//     pid_t p = getpid();
+//     if (p != myid)
+//         return;
+//     //print();
+//     if (childid != -1)
+//     {
+//         kill(childid, SIGTTIN);
+//         kill(childid, SIGTSTP);
+//         // back_count++;
+//         // back[back_count].pid = childpid;
+//         // back[back_count].is_back = 1;
+//         // strcpy(back[back_count].name, fore.name);
+//     }
+//     signal(SIGTSTP, ctrl_z);
+// }
+
 // ****************************************** MAIN LOOP ***********************************************************//
+
+
 void loop(void)
 {
   char *command; //reading the command
@@ -128,12 +165,18 @@ void loop(void)
   int status = 1; //status of the executed command
   char ogcom[10000];
 
+
+
   do
   {
     int redflag = 0;
-
-    //********************************************* PROMPT CREATION ***********************************************
+    childid=-1;
+    //********************************************* SIGNALS ***********************************************
     signal(SIGCHLD, done);
+    
+    // signal(SIGINT, ctrl_c);
+    // signal(SIGTSTP, ctrl_z);
+       
 
     // *********************************** DISPLAYING THE PROMPT  ***********************************************
 
@@ -157,100 +200,121 @@ void loop(void)
 
       getcwd(cwd, sizeof(cwd));
 
-      token[0] = strtok(list_com[j], " \t\r\n");
-      ll k = 0;
-
-      while (token[k] != NULL) //Separating tokens within the command
+      if (pipecheck(list_com[j]))                       //**************************CHECK *************************************//
       {
-        k++;
-        token[k] = strtok(NULL, " \t\r\n");
-      }
-
-      for (ll i = 0; i < k; i++)
-      {
-        if ((strcmp(token[i], ">") == 0 || strcmp(token[i], "<") == 0 || strcmp(token[i], ">>") == 0) && redflag == 0)
-          redflag = 1;
-        else if ((strcmp(token[i], ">") == 0 || strcmp(token[i], "<") == 0 || strcmp(token[i], ">>") == 0) && redflag == 1)
-          redflag = 2;
-      }
-
-      if (strcmp(token[0], "history") != 0) //WRITING INTO HISTORY
-      {
-        int q = his_check(token[0]);
-      }
-
-      //************************************************************************* IF ELSE OF COMMANDS ******************************************************
-
-      if (strcmp(token[k - 1], "&") == 0) // FOR BACKGROUND PROCESSES
-      {
-        // printf("entered back\n");
-        token[k - 1] = NULL;
-        back(token);
-      }
-
-      else if (redflag == 1 || redflag == 2) // FOR REDIRECTION
-        redirection(token, k, ogcom, redflag);
-
-      else if (token[0][0] == '.') // FOR EXECUTABLES
-        fore(token);
-
-      else if (strcmp(token[0], "exit") == 0) //EXIT
-      {
-        FILE *fd2;
-        fd2 = fopen("his.txt", "w");
-
-        for (ll i = 0; i < hsize; i++)
+        temp[0] = strtok(list_com[j], "|");
+        ll k = 0;
+        while (temp[k] != NULL)
         {
-          fprintf(fd2, "%s\n", history[i]);
+          k++;
+          temp[k] = strtok(NULL, "|");
         }
-        fclose(fd2);
-
-        status = 0;
-      }
-      else if (strcmp(token[0], "pwd") == 0) //COMMAND : PWD
-        pwd();
-      else if (strcmp(token[0], "cd") == 0) //COMMAND : CD
-      {
-        if (k > 2)
-          perror("myshell: Error: Too many arguments\n");
-        if (k > 1)
-          cd(token[1]);
-        else
-          chdir(pseudo_home);
-      }
-
-      else if (strcmp(token[0], "echo") == 0) //COMMAND : ECHO
-      {
-        char st[10000] = "";
-        for (ll o = 1; o <= k - 1; o++)
-        {
-          strcat(st, token[o]);
-          strcat(st, " ");
-        }
-        echo(st);
-      }
-
-      else if (strcmp(token[0], "ls") == 0) // COMMAND :LS
-        ls(cwd, k, token);
-
-      else if (strcmp(token[0], "pinfo") == 0) //COMMAND :PINFO
-        pinfo(k, token);
-
-      else if (strcmp(token[0], "vi") == 0 || strcmp(token[0], "emacs") == 0 || strcmp(token[0], "gedit") == 0) // COMMAND : VI, EMACS, GEDIT FOREGROUND
-        fore(token);
-
-      else if (strcmp(token[0], "code") == 0) // TRIAL COMMAND FOR VSCODE
-        fore(token);
-
-      else if (strcmp(token[0], "history") == 0) //HISTORY
-      {
-        history_print();
-        his_check(token[0]);
+        piping(temp,k);
       }
 
       else
-        // printf("myshell: command not found: %s\n", token[0]);
-        fore(token);
+      {
+        token[0] = strtok(list_com[j], " \t\r\n");
+        ll k = 0;
+
+        while (token[k] != NULL) //Separating tokens within the command
+        {
+          k++;
+          token[k] = strtok(NULL, " \t\r\n");
+        }
+
+        for (ll i = 0; i < k; i++)
+        {
+          if ((strcmp(token[i], ">") == 0 || strcmp(token[i], "<") == 0 || strcmp(token[i], ">>") == 0) && redflag == 0)
+            redflag = 1;
+          else if ((strcmp(token[i], ">") == 0 || strcmp(token[i], "<") == 0 || strcmp(token[i], ">>") == 0) && redflag == 1)
+            redflag = 2;
+        }
+
+        if (strcmp(token[0], "history") != 0) //WRITING INTO HISTORY
+        {
+          int q = his_check(token[0]);
+        }
+
+        //************************************************************************* IF ELSE OF COMMANDS ******************************************************
+
+        if (strcmp(token[k - 1], "&") == 0) // FOR BACKGROUND PROCESSES
+        {
+          // printf("entered back\n");
+          token[k - 1] = NULL;
+          back(token);
+        }
+
+        else if (redflag == 1 || redflag == 2) // FOR REDIRECTION
+          redirection(token, k, ogcom, redflag);
+
+        else if (token[0][0] == '.') // FOR EXECUTABLES
+          fore(token);
+
+        else if (strcmp(token[0], "exit") == 0) //EXIT
+        {
+          FILE *fd2;
+          fd2 = fopen("his.txt", "w");
+
+          for (ll i = 0; i < hsize; i++)
+          {
+            fprintf(fd2, "%s\n", history[i]);
+          }
+          fclose(fd2);
+
+          status = 0;
+        }
+        else if (strcmp(token[0], "pwd") == 0) //COMMAND : PWD
+          pwd();
+        else if (strcmp(token[0], "cd") == 0) //COMMAND : CD
+        {
+          if (k > 2)
+            perror("myshell: Error: Too many arguments\n");
+          if (k > 1)
+            cd(token[1]);
+          else
+            chdir(pseudo_home);
+        }
+
+        else if (strcmp(token[0], "echo") == 0) //COMMAND : ECHO
+        {
+          char st[10000] = "";
+          for (ll o = 1; o <= k - 1; o++)
+          {
+            strcat(st, token[o]);
+            strcat(st, " ");
+          }
+          echo(st);
+        }
+
+        else if (strcmp(token[0], "ls") == 0) // COMMAND :LS
+          ls(cwd, k, token);
+
+        else if (strcmp(token[0], "pinfo") == 0) //COMMAND :PINFO
+          pinfo(k, token);
+
+        else if (strcmp(token[0], "vi") == 0 || strcmp(token[0], "emacs") == 0 || strcmp(token[0], "gedit") == 0) // COMMAND : VI, EMACS, GEDIT FOREGROUND
+          fore(token);
+
+        else if (strcmp(token[0], "code") == 0) // TRIAL COMMAND FOR VSCODE
+          fore(token);
+
+        else if (strcmp(token[0], "history") == 0) //HISTORY
+        {
+          history_print();
+          his_check(token[0]);
+        }
+
+        else if(strcmp(token[0],"jobs")==0)
+        {
+          print_jobs();
+        }
+
+        else
+          // printf("myshell: command not found: %s\n", token[0]);
+          fore(token);
+        
+      }
     }
 
   } while (status);
@@ -258,6 +322,9 @@ void loop(void)
 
 int main(int argc, char const *argv[])
 {
+  myid=getpid();
+  // printf("ORIGINAL SHELL ID= %lld\n",myid);
+
   char old_his[100000];
   ssize_t his_size = 100000;
   int line = 0, cnt = 0, t = 0;
@@ -309,6 +376,7 @@ int main(int argc, char const *argv[])
   int pos = 0, sl;
   child_flag = 0;
   curid = -1;
+  job_count=0;
 
   getcwd(currentdir, sizeof(currentdir));
   // printf("%s\n", currentdir);
