@@ -22,6 +22,7 @@ char history[10][1000];
 int pid_arr[100000];
 int child_flag;
 int curid;
+int kjobkill;
 char *token[100000];
 
 typedef struct jobs{

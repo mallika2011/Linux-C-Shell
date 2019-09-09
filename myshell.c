@@ -72,12 +72,15 @@ void promptprint()
 
 void del_process(int id)
 {
+
+  // printf("Entered killproc\n");
   int flag=0;
   for (ll i = 1; i <= job_count; i++)
   {
     // printf("loop\n");
     if (job_arr[i].pid == id)
     {
+      // printf("job killed\n");
       flag=1;
       for (ll j = i; j < job_count; j++)
         job_arr[j] = job_arr[j + 1];
@@ -90,6 +93,7 @@ void del_process(int id)
 
 void done()
 {
+  // printf("ENTERED\n");
   pid_t p;
   int status;
 
@@ -103,8 +107,12 @@ void done()
     }
 
     const int exit = WEXITSTATUS(status);
-    if (WIFEXITED(status) && p == job_arr[z].pid)
+
+    // printf("WIFEXITED (STATUS) OF KJOB = %d\nWEXITSTATUS %d\n", WIFEXITED(status), WEXITSTATUS(status));
+
+    if ( (WIFEXITED(status) && p == job_arr[z].pid) || (kjobkill==1 && p == job_arr[z].pid) )
     {
+      kjobkill=0;
       if (exit == 0)
         fprintf(stderr, "\nExitted normally with exit status: %d\n", exit);
       else
@@ -115,6 +123,8 @@ void done()
       promptprint();
 
       fflush(stdout);
+
+      // printf("pid of proc being killed = %lld\n", p);
       del_process(p);
     }
   }
@@ -305,8 +315,10 @@ void loop(void)
           his_check(token[0]);
         }
 
-        else if(strcmp(token[0],"jobs")==0)
+        else if(strcmp(token[0],"jobs")==0)       //JOBS
           alljobs();
+        else if(strcmp(token[0],"kjob")==0)
+          kjob(token,k);
         else
           // printf("myshell: command not found: %s\n", token[0]);
           fore(token);
@@ -374,6 +386,7 @@ int main(int argc, char const *argv[])
   child_flag = 0;
   curid = -1;
   job_count=0;
+  kjobkill=0;
 
   getcwd(currentdir, sizeof(currentdir));
   // printf("%s\n", currentdir);
