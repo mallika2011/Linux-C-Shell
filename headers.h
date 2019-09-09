@@ -44,6 +44,8 @@ struct jobs job_arr[100000];
 /*PIPING*/      int pipecheck();
 /*PIPING*/      void piping(char *commands[], ll k);
 /*JOB PRINT*/   void alljobs();
+/*KJOBS*/       void kjob(char *token[],ll k);
+
 void history_print();
 int his_check(char new[]);
 void his_load(ll l, ll r);
