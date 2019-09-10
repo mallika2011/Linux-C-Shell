@@ -23,6 +23,7 @@ int pid_arr[100000];
 int child_flag;
 int curid;
 int kjobkill;
+int overkillflag;
 char *token[100000];
 
 typedef struct jobs{
@@ -46,6 +47,9 @@ struct jobs job_arr[100000];
 /*PIPING*/      void piping(char *commands[], ll k);
 /*JOB PRINT*/   void alljobs();
 /*KJOBS*/       void kjob(char *token[],ll k);
+/*FG*/          void fg(char *token[]);
+/*BG*/          void bg(char *token[]);
+/*OVERKILL*/    void overkill();
 
 void history_print();
 int his_check(char new[]);

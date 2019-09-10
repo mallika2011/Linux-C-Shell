@@ -75,6 +75,9 @@ void del_process(int id)
 
   // printf("Entered killproc\n");
   int flag=0;
+  if(id==-1)
+    job_count=0;
+  else
   for (ll i = 1; i <= job_count; i++)
   {
     // printf("loop\n");
@@ -87,7 +90,7 @@ void del_process(int id)
       job_count--;
     }
   }
-  if(flag==0)
+  if(flag==0 && id!=-1)
     printf("Error: no such process found\n");
 }
 
@@ -110,23 +113,27 @@ void done()
 
     // printf("WIFEXITED (STATUS) OF KJOB = %d\nWEXITSTATUS %d\n", WIFEXITED(status), WEXITSTATUS(status));
 
-    if ( (WIFEXITED(status) && p == job_arr[z].pid) || (kjobkill==1 && p == job_arr[z].pid) )
+    if ( ((WIFEXITED(status) && p == job_arr[z].pid) || (kjobkill==1 && p == job_arr[z].pid) ) && overkillflag ==0)
     {
-      kjobkill=0;
+      if(kjobkill ==1)
+        kjobkill=0;
+      // else if(overkillflag==1)
+      //   overkillflag=0;
       if (exit == 0)
         fprintf(stderr, "\nExitted normally with exit status: %d\n", exit);
       else
         fprintf(stderr, "\nExitted abnormally\n");
 
-      fprintf(stderr, "%s with pid %d: exited\n", token[0], p);
+      fprintf(stderr, "%s with pid %d: exited\n", job_arr[z].name, p);
 
       promptprint();
 
       fflush(stdout);
-
       // printf("pid of proc being killed = %lld\n", p);
       del_process(p);
     }
+
+    del_process(-1);
   }
 }
 
@@ -254,7 +261,6 @@ void loop(void)
           token[k - 1] = NULL;
           back(token);
         }
-
         else if (redflag == 1 || redflag == 2) // FOR REDIRECTION
           redirection(token, k, ogcom, redflag);
 
@@ -285,7 +291,6 @@ void loop(void)
           else
             chdir(pseudo_home);
         }
-
         else if (strcmp(token[0], "echo") == 0) //COMMAND : ECHO
         {
           char st[10000] = "";
@@ -299,26 +304,27 @@ void loop(void)
 
         else if (strcmp(token[0], "ls") == 0) // COMMAND :LS
           ls(cwd, k, token);
-
         else if (strcmp(token[0], "pinfo") == 0) //COMMAND :PINFO
           pinfo(k, token);
-
         else if (strcmp(token[0], "vi") == 0 || strcmp(token[0], "emacs") == 0 || strcmp(token[0], "gedit") == 0) // COMMAND : VI, EMACS, GEDIT FOREGROUND
           fore(token);
-
         else if (strcmp(token[0], "code") == 0) // TRIAL COMMAND FOR VSCODE
           fore(token);
-
         else if (strcmp(token[0], "history") == 0) //HISTORY
         {
           history_print();
           his_check(token[0]);
         }
-
         else if(strcmp(token[0],"jobs")==0)       //JOBS
           alljobs();
-        else if(strcmp(token[0],"kjob")==0)
+        else if(strcmp(token[0],"kjob")==0)       //KJOBS
           kjob(token,k);
+        else if(strcmp(token[0],"bg")==0)         //BG
+          bg(token);  
+        else if(strcmp(token[0],"fg")==0)         //FG
+          fg(token);
+        else if(strcmp(token[0],"overkill")==0)
+          overkill();
         else
           // printf("myshell: command not found: %s\n", token[0]);
           fore(token);
@@ -387,6 +393,7 @@ int main(int argc, char const *argv[])
   curid = -1;
   job_count=0;
   kjobkill=0;
+  overkillflag=0;
 
   getcwd(currentdir, sizeof(currentdir));
   // printf("%s\n", currentdir);
