@@ -153,23 +153,23 @@ void done()
 //     signal(SIGINT, ctrl_c);
 // }
 
-// void ctrl_z(int signo)
-// {
-//     pid_t p = getpid();
-//     if (p != myid)
-//         return;
-//     //print();
-//     if (childid != -1)
-//     {
-//         kill(childid, SIGTTIN);
-//         kill(childid, SIGTSTP);
-//         // back_count++;
-//         // back[back_count].pid = childpid;
-//         // back[back_count].is_back = 1;
-//         // strcpy(back[back_count].name, fore.name);
-//     }
-//     signal(SIGTSTP, ctrl_z);
-// }
+void ctrl_z(int signo)
+{
+    pid_t p = getpid();
+    if (p != myid)
+        return;
+    //print();
+    if (childid != -1)
+    {
+        kill(childid, SIGTTIN);
+        kill(childid, SIGTSTP);
+        // back_count++;
+        // back[back_count].pid = childpid;
+        // back[back_count].is_back = 1;
+        // strcpy(back[back_count].name, fore.name);
+    }
+    signal(SIGTSTP, ctrl_z);
+}
 
 // ****************************************** MAIN LOOP ***********************************************************//
 
@@ -239,7 +239,7 @@ void loop(void)
           k++;
           token[k] = strtok(NULL, " \t\r\n");
         }
-
+        // printf("Numner of tokens = %lld\n",k);
         for (ll i = 0; i < k; i++)
         {
           if ((strcmp(token[i], ">") == 0 || strcmp(token[i], "<") == 0 || strcmp(token[i], ">>") == 0) && redflag == 0)
@@ -323,8 +323,12 @@ void loop(void)
           bg(token);  
         else if(strcmp(token[0],"fg")==0)         //FG
           fg(token);
-        else if(strcmp(token[0],"overkill")==0)
+        else if(strcmp(token[0],"overkill")==0)   //OVERKILL
           overkill();
+        else if(strcmp(token[0],"setenv")==0)
+          settingenv(token,k);
+        else if(strcmp(token[0],"unsetenv")==0)
+          unsettingenv(token,k);
         else
           // printf("myshell: command not found: %s\n", token[0]);
           fore(token);
