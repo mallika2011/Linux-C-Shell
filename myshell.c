@@ -240,12 +240,23 @@ void loop(void)
           token[k] = strtok(NULL, " \t\r\n");
         }
         // printf("Numner of tokens = %lld\n",k);
-        for (ll i = 0; i < k; i++)
+        for (ll j = 0; j < k; j++)
         {
-          if ((strcmp(token[i], ">") == 0 || strcmp(token[i], "<") == 0 || strcmp(token[i], ">>") == 0) && redflag == 0)
-            redflag = 1;
-          else if ((strcmp(token[i], ">") == 0 || strcmp(token[i], "<") == 0 || strcmp(token[i], ">>") == 0) && redflag == 1)
-            redflag = 2;
+          // printf("TOKEN[i]= %s\n",token[i]);
+
+          for(ll i=0; token[j][i]; i++)
+          if ((token[j][i]=='>')|| token[j][i]=='<' || (token[j][i]=='>' && token[j][i+1]=='>') && redflag == 0)
+              {
+                redflag = 1;
+                if(token[j][i]=='>' && token[j][i+1]=='>')
+                  i++;
+              }
+          else if ((token[j][i]=='>')|| token[j][i]=='<' || (token[j][i]=='>' && token[j][i+1]=='>') && redflag == 1)
+              {
+                redflag = 2;
+                if(token[j][i]=='>' && token[j][i+1]=='>')
+                  i++;
+              }
         }
 
         if (strcmp(token[0], "history") != 0) //WRITING INTO HISTORY

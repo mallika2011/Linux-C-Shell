@@ -4,14 +4,9 @@ int status;
 
 void choice(int fds[], char *from[], int k, int oldin, int oldout)
 {
-    // dup2(fds[0], 0);
 
-    // printf("ENTERED CHOICE *****************\n");
-
-    //---------------------------
     if (strcmp(from[k - 1], "&") == 0) // FOR BACKGROUND PROCESSES
     {
-        // printf("entered back\n");
         from[k - 1] = NULL;
         back(from);
     }
@@ -68,7 +63,6 @@ void choice(int fds[], char *from[], int k, int oldin, int oldout)
             close(fds[0]);
         }
     }
-    // dup2(oldin, 0);
 }
 
 void both(char com[], ll app)
@@ -121,11 +115,11 @@ void both(char com[], ll app)
         from[k] = strtok(NULL, " \t\n\r");
     }
 
-    printf("%s-%s-%s-\n", from[0], input_file, output_file);
+    // printf("%s-%s-%s-\n", from[0], input_file, output_file);
 
     if (strcmp(input_file, "") != 0 && strcmp(output_file, "") == 0) // HAS INPUT REDIRECTION ONLY
     {
-        printf("came into input\n");
+        // printf("came into input\n");
         int oldin = dup(STDIN_FILENO);
         int pid = fork();
 
@@ -140,9 +134,6 @@ void both(char com[], ll app)
             else
             {
                 dup2(fds[0], 0);
-                // int z = execvp(from[0], from);
-                // if (z < 0)
-                //     perror("myshell:Error\n");
                 choice(fds,from,k,oldin,-1);
                 dup2(oldin, 0);
             }
@@ -154,7 +145,7 @@ void both(char com[], ll app)
     }
     else if (strcmp(output_file, "") != 0 && strcmp(input_file, "") == 0) //HAS OUTPUT REDIRECTION ONLY
     {
-        printf("Came into output\n");
+        // printf("Came into output\n");
         int oldout = dup(STDOUT_FILENO);
         int pid = fork();
 
@@ -166,16 +157,10 @@ void both(char com[], ll app)
 
         if (pid == 0)
         {
-            // int z = execvp(from[0], from);
-            // if (z < 0)
-            // {
-            //     perror("myshell:Error\n");
-            //     dup2(oldout, 1);
-            //     close(fds[0]);
-            // }
             choice(fds,from,k,-1,oldout);
-            dup2(oldout, 1);
-            close(fds[0]);
+            // printf("did choice\n");
+            // dup2(oldout, 1);
+            // close(fds[0]);
 
             exit(0);
         }
@@ -190,7 +175,7 @@ void both(char com[], ll app)
     }
     else
     {
-        printf("Came into both\n");
+        // printf("Came into both\n");
         int oldin = dup(STDIN_FILENO);
         int oldout = dup(STDOUT_FILENO);
         int pid = fork();

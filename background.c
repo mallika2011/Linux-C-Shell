@@ -9,10 +9,13 @@ void back(char *token[])
         perror("Error: Fork Failed\n");
     else if (pid == 0)
     {
-
-        int z = execvp(token[0], token);
-        if (z < 0)
-            perror("myshell:Error\n");
+        
+        if(strcmp(token[0],"vim")!=0)
+        {
+            int z = execvp(token[0], token);
+            if (z < 0)
+                perror("myshell:Error\n");
+        }
         exit(0);
     }
     else
