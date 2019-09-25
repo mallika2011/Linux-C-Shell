@@ -25,6 +25,10 @@ int curid;
 int kjobkill;
 int overkillflag;
 char *token[100000];
+int redflag;
+int pipingflag;
+char transitfile[100000];
+int transitfd;
 
 typedef struct jobs{
     char name[10000];

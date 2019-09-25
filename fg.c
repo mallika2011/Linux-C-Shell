@@ -10,8 +10,8 @@ void fg(char *token[])
         {
             flag = 1;
             kill(job_arr[num].pid, SIGCONT);
-            del_process(job_arr[num].pid);
-            waitpid(-1, NULL, WUNTRACED);
+            del_process(job_arr[num].pid);  // DELETING THE PROCESS FROM THE BACKGROUND PROC ARRAY
+            waitpid(-1, NULL, WUNTRACED);   // WAITING FOR THAT PROCESS TO FINISH EXECUTION
         }
     }
     if (flag == 0)

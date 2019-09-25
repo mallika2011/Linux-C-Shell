@@ -145,23 +145,25 @@ void done()
 //     signal(SIGINT, ctrl_c);
 // }
 
-void ctrl_z(int signo)
-{
-    pid_t p = getpid();
-    if (p != myid)
-        return;
-    //print();
-    if (childid != -1)
-    {
-        kill(childid, SIGTTIN);
-        kill(childid, SIGTSTP);
-        // back_count++;
-        // back[back_count].pid = childpid;
-        // back[back_count].is_back = 1;
-        // strcpy(back[back_count].name, fore.name);
-    }
-    signal(SIGTSTP, ctrl_z);
-}
+// void ctrl_z(int signo)
+// {
+//     printf("ININININI\n");
+//     pid_t p = getpid();
+//     if (p != myid)
+//         return;
+//     //print();
+//     if (childid != -1)
+//     {
+//         // kill(childid, SIGTTIN);
+//         printf("double\n");
+//         kill((pid_t)childid, SIGTSTP);
+//         // back_count++;
+//         // back[back_count].pid = childpid;
+//         // back[back_count].is_back = 1;
+//         // strcpy(back[back_count].name, fore.name);
+//     }
+//     signal(SIGTSTP, ctrl_z);
+// }
 
 // ****************************************** MAIN LOOP ***********************************************************//
 
@@ -178,7 +180,7 @@ void loop(void)
 
   do
   {
-    int redflag = 0;
+    redflag = 0;
     childid=-1;
     //********************************************* SIGNALS ***********************************************
     signal(SIGCHLD, done);
@@ -218,6 +220,7 @@ void loop(void)
           k++;
           temp[k] = strtok(NULL, "|");
         }
+        printf("OG COM : %s\n", ogcom);
         piping(temp,k);
       }
 
@@ -270,7 +273,7 @@ void loop(void)
         else if (token[0][0] == '.') // FOR EXECUTABLES
           fore(token);
 
-        else if (strcmp(token[0], "exit") == 0) //EXIT
+        else if (strcmp(token[0], "quit") == 0) //EXIT
         {
           FILE *fd2;
           fd2 = fopen("his.txt", "w");
@@ -401,6 +404,7 @@ int main(int argc, char const *argv[])
   job_count=0;
   kjobkill=0;
   overkillflag=0;
+  pipingflag=0;
 
   getcwd(currentdir, sizeof(currentdir));
   // printf("%s\n", currentdir);
