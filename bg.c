@@ -9,7 +9,8 @@ void bg(char *token[])
         if(i==num)
         {
             flag=1;
-            kill(job_arr[num].pid,SIGSTOP);
+            kill(job_arr[num].pid, SIGTTIN);  
+            kill(job_arr[num].pid,SIGCONT);
         }
     }
     if(flag==0)

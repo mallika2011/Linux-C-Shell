@@ -3,6 +3,8 @@
 void alljobs()
 {
     // printf("job count = %lld   %s   %lld\n",job_count, job_arr[1].name, job_arr[1].pid);
+    // printf("JOB COUNT  = %lld\n", job_count);
+
     for(ll i=1; i<=job_count; i++)
     {
         ll pid=job_arr[i].pid;

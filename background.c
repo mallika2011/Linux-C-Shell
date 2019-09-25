@@ -25,6 +25,8 @@ void back(char *token[])
         // pid_arr[curid] = pid;
         job_arr[job_count].pid = pid;
         strcpy(job_arr[job_count].name, token[0]); // TO KILL PROCESSES
+
+        // printf("job array ")
     }
 
     return;

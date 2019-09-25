@@ -72,8 +72,7 @@ void promptprint()
 
 void del_process(int id)
 {
-
-  // printf("Entered killproc\n");
+  // printf("Entered killproc with job count = %lld and proc number=%d\n", job_count, id);
   int flag=0;
   if(id==-1)
     job_count=0;
@@ -99,42 +98,35 @@ void done()
   // printf("ENTERED\n");
   pid_t p;
   int status;
-
   p = waitpid(-1, &status, WNOHANG);
-  // printf("Curid in loop = %d\n", curid);
   for (ll z = 1; z <= job_count; z++)
   {
     if (p < 0)
     {
       perror("\nwaitpid failed\n");
     }
-
     const int exit = WEXITSTATUS(status);
 
-    // printf("WIFEXITED (STATUS) OF KJOB = %d\nWEXITSTATUS %d\n", WIFEXITED(status), WEXITSTATUS(status));
+    // printf("WIFEXITED (STATUS) OF KJOB = %d\nWEXITSTATUS %d  p= %d  job_arr[z] %d\n", WIFEXITED(status), WEXITSTATUS(status),p,job_arr[z].pid);
 
     if ( ((WIFEXITED(status) && p == job_arr[z].pid) || (kjobkill==1 && p == job_arr[z].pid) ) && overkillflag ==0)
     {
       if(kjobkill ==1)
         kjobkill=0;
-      // else if(overkillflag==1)
-      //   overkillflag=0;
       if (exit == 0)
         fprintf(stderr, "\nExitted normally with exit status: %d\n", exit);
       else
         fprintf(stderr, "\nExitted abnormally\n");
 
       fprintf(stderr, "%s with pid %d: exited\n", job_arr[z].name, p);
-
       promptprint();
-
       fflush(stdout);
-      // printf("pid of proc being killed = %lld\n", p);
       del_process(p);
     }
 
-    del_process(-1);
   }
+    if(overkillflag==1)
+    del_process(-1);
 }
 
 // void ctrl_c(int signo)

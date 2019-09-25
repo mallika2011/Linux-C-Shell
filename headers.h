@@ -52,7 +52,7 @@ struct jobs job_arr[100000];
 /*OVERKILL*/        void overkill();
 /*SETENV*/          void settingenv(char *token[],ll k);
 /*UNSETTING ENV*/   void unsettingenv(char *token[], ll k) ;
-
+/*del proc*/        void del_process(int id);
 void history_print();
 int his_check(char new[]);
 void his_load(ll l, ll r);
