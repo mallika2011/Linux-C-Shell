@@ -2,34 +2,44 @@
 
 //********************************************** CD ***************************************************************//
 
-void cd(char path[])
+void cd(char *token[], ll k)
 {
     // printf("Into the cd function\nPath =%s\n", path);
-    
-    if (strcmp(path, "~") == 0)
-    {
-        chdir(pseudo_home);
-        // printf("Path to go to =%s\n", path);
-        char cur[1000];
-        getcwd(cur, sizeof(cur));
-        // printf("current dir = %s\n", cur);
 
+    if (k > 2)
+        perror("myshell: Error: Too many arguments\n");
+
+    if (k > 1)
+    {
+        char path[10000];
+        strcpy(path, token[1]);
+        if (strcmp(path, "~") == 0)
+        {
+            chdir(pseudo_home);
+            // printf("Path to go to =%s\n", path);
+            char cur[1000];
+            getcwd(cur, sizeof(cur));
+            // printf("current dir = %s\n", cur);
+
+            return;
+        }
+        else if (path[0] == '~' && strlen(path) > 1)
+            path[0] = '.';
+
+        // printf("Path to go to =%s\n", path);
+        int check = chdir(path);
+        if (check < 0)
+        {
+            printf("cd: no such file or directory: %s\n", path);
+        }
+        else
+        {
+            char cur[1000];
+            getcwd(cur, sizeof(cur));
+            // printf("current dir = %s\n", cur);
+        }
         return;
     }
-    else if (path[0] == '~' && strlen(path) > 1)
-        path[0] = '.';
-
-    // printf("Path to go to =%s\n", path);
-    int check = chdir(path);
-    if (check < 0)
-    {
-        printf("cd: no such file or directory: %s\n", path);
-    }
     else
-    {
-        char cur[1000];
-        getcwd(cur, sizeof(cur));
-        // printf("current dir = %s\n", cur);
-    }
-    return;
+        chdir(pseudo_home);
 }

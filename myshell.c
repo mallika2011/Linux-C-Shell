@@ -6,7 +6,7 @@ char dir[100000];
 char *list_com[100000], *temp[100000];
 int s, x = 0;
 ll ii = 0;
-ll l, r, myid, childid;
+ll l, r, myid;
 
 void promptprint()
 {
@@ -129,41 +129,43 @@ void done()
     del_process(-1);
 }
 
-// void ctrl_c(int signo)
-// {
-//     pid_t p = getpid();
+void ctrl_c(int signo)
+{
+    pid_t p = getpid();
 
-//     printf("myid = %d\nchildid = %d\n",p, childid);
-//     if (p != myid)
-//         return;
-//     printf("next step\n");
-//     if (childid != -1)
-//     {
-//       printf("Killing\n");
-//       kill(childid, SIGINT);
-//     }
-//     signal(SIGINT, ctrl_c);
-// }
+    printf("myid = %d\nchildid = %d\n",p, current_fore.pid);
+    if (p != myid)
+        return;
+    printf("next step\n");
+    if (current_fore.pid != -1)
+    {
+      printf("Killing\n");
+      kill(current_fore.pid, SIGINT);
+    }
+    signal(SIGINT, ctrl_c);
+}
 
-// void ctrl_z(int signo)
-// {
-//     printf("ININININI\n");
-//     pid_t p = getpid();
-//     if (p != myid)
-//         return;
-//     //print();
-//     if (childid != -1)
-//     {
-//         // kill(childid, SIGTTIN);
-//         printf("double\n");
-//         kill((pid_t)childid, SIGTSTP);
-//         // back_count++;
-//         // back[back_count].pid = childpid;
-//         // back[back_count].is_back = 1;
-//         // strcpy(back[back_count].name, fore.name);
-//     }
-//     signal(SIGTSTP, ctrl_z);
-// }
+void ctrl_z(int signo)
+{
+    printf("ININININI\n");
+    pid_t p = getpid();
+    if (p != myid)
+        return;
+    printf("in z - %d\n",current_fore.pid);
+    if (current_fore.pid != -1)
+    {
+        kill(current_fore.pid, SIGTTIN);
+         printf("next\n");
+        kill(current_fore.pid, SIGTSTP);
+        job_count++;
+        job_arr[job_count].pid=current_fore.pid;
+        strcpy(job_arr[job_count].name,current_fore.name);
+        // return;        
+    }
+    signal(SIGTSTP, ctrl_z);
+    fflush(stdout);
+    return;
+}
 
 // ****************************************** MAIN LOOP ***********************************************************//
 
@@ -181,13 +183,11 @@ void loop(void)
   do
   {
     redflag = 0;
-    childid=-1;
+    current_fore.pid=-1;
     //********************************************* SIGNALS ***********************************************
     signal(SIGCHLD, done);
-    
-    // signal(SIGINT, ctrl_c);
-    // signal(SIGTSTP, ctrl_z);
-       
+    signal(SIGINT, ctrl_c);
+    signal(SIGTSTP, ctrl_z);
 
     // *********************************** DISPLAYING THE PROMPT  ***********************************************
 
@@ -220,7 +220,6 @@ void loop(void)
           k++;
           temp[k] = strtok(NULL, "|");
         }
-        printf("OG COM : %s\n", ogcom);
         piping(temp,k);
       }
 
@@ -290,22 +289,11 @@ void loop(void)
           pwd();
         else if (strcmp(token[0], "cd") == 0) //COMMAND : CD
         {
-          if (k > 2)
-            perror("myshell: Error: Too many arguments\n");
-          if (k > 1)
-            cd(token[1]);
-          else
-            chdir(pseudo_home);
+          cd(token,k);
         }
         else if (strcmp(token[0], "echo") == 0) //COMMAND : ECHO
         {
-          char st[10000] = "";
-          for (ll o = 1; o <= k - 1; o++)
-          {
-            strcat(st, token[o]);
-            strcat(st, " ");
-          }
-          echo(st);
+          echo(token, k);
         }
 
         else if (strcmp(token[0], "ls") == 0) // COMMAND :LS

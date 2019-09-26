@@ -16,28 +16,15 @@ void choice(int fds[], char *from[], int k, int oldin, int oldout)
         pwd();
     else if (strcmp(from[0], "cd") == 0) //COMMAND : CD
     {
-        if (k > 2)
-            perror("myshell: Error: Too many arguments\n");
-        if (k > 1)
-            cd(from[1]);
-        else
-            chdir(pseudo_home);
+        cd(from,k);
     }
 
     else if (strcmp(from[0], "echo") == 0) //COMMAND : ECHO
     {
-        char st[10000] = "";
-        for (ll o = 1; o <= k - 1; o++)
-        {
-            strcat(st, from[o]);
-            strcat(st, " ");
-        }
-        echo(st);
+        echo(token, k);
     }
-
     else if (strcmp(from[0], "ls") == 0) // COMMAND :LS
     {
-        printf("entere dyour ls\n");
         ls(cwd, k, from);
     }
     else if (strcmp(from[0], "pinfo") == 0) //COMMAND :PINFO

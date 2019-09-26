@@ -1,12 +1,8 @@
+emcas
+emacs
+fg
+exit
 quit
-
-
-
-
-
-
-
-
 
 
 

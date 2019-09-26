@@ -9,6 +9,8 @@ void fg(char *token[])
         if (i == num)
         {
             flag = 1;
+            current_fore.pid=job_arr[num].pid;
+            strcpy(current_fore.name,job_arr[num].name);
             kill(job_arr[num].pid, SIGCONT);
             del_process(job_arr[num].pid);  // DELETING THE PROCESS FROM THE BACKGROUND PROC ARRAY
             waitpid(-1, NULL, WUNTRACED);   // WAITING FOR THAT PROCESS TO FINISH EXECUTION

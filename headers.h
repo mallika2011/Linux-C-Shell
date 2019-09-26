@@ -29,6 +29,7 @@ int redflag;
 int pipingflag;
 char transitfile[100000];
 int transitfd;
+int childid;
 
 typedef struct jobs{
     char name[10000];
@@ -37,11 +38,12 @@ typedef struct jobs{
 
 ll job_count;
 struct jobs job_arr[100000];
+struct jobs current_fore;
 
 /*MAIN LOOP */      void loop(void);
 /*PWD */            void pwd();
-/*CD */             void cd(char path[]);
-/*ECHO */           void echo(char string[]);
+/*CD */             void cd(char *token[], ll k);
+/*ECHO */           void echo(char *token[], ll k);
 /*LS */             void ls(char dir[], ll k, char *token[]);
 /*PINFO */          void pinfo(ll k, char *token[]);
 /*FOREGROUND */     void fore(char *token[]);
