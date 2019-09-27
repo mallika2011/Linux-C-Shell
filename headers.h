@@ -59,6 +59,8 @@ struct jobs current_fore;
 /*SETENV*/          void settingenv(char *token[],ll k);
 /*UNSETTING ENV*/   void unsettingenv(char *token[], ll k) ;
 /*del proc*/        void del_process(int id);
+// void choice(int fds[], char *from[], int k, int oldin, int oldout);
+
 void history_print();
 int his_check(char new[]);
 void his_load(ll l, ll r);

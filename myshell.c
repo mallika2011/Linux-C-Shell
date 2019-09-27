@@ -73,23 +73,23 @@ void promptprint()
 void del_process(int id)
 {
   // printf("Entered killproc with job count = %lld and proc number=%d\n", job_count, id);
-  int flag=0;
-  if(id==-1)
-    job_count=0;
+  int flag = 0;
+  if (id == -1)
+    job_count = 0;
   else
-  for (ll i = 1; i <= job_count; i++)
-  {
-    // printf("loop\n");
-    if (job_arr[i].pid == id)
+    for (ll i = 1; i <= job_count; i++)
     {
-      // printf("job killed\n");
-      flag=1;
-      for (ll j = i; j < job_count; j++)
-        job_arr[j] = job_arr[j + 1];
-      job_count--;
+      // printf("loop\n");
+      if (job_arr[i].pid == id)
+      {
+        // printf("job killed\n");
+        flag = 1;
+        for (ll j = i; j < job_count; j++)
+          job_arr[j] = job_arr[j + 1];
+        job_count--;
+      }
     }
-  }
-  if(flag==0 && id!=-1)
+  if (flag == 0 && id != -1)
     printf("Error: no such process found\n");
 }
 
@@ -109,10 +109,10 @@ void done()
 
     // printf("WIFEXITED (STATUS) OF KJOB = %d\nWEXITSTATUS %d  p= %d  job_arr[z] %d\n", WIFEXITED(status), WEXITSTATUS(status),p,job_arr[z].pid);
 
-    if ( ((WIFEXITED(status) && p == job_arr[z].pid) || (kjobkill==1 && p == job_arr[z].pid) ) && overkillflag ==0)
+    if (((WIFEXITED(status) && p == job_arr[z].pid) || (kjobkill == 1 && p == job_arr[z].pid)) && overkillflag == 0)
     {
-      if(kjobkill ==1)
-        kjobkill=0;
+      if (kjobkill == 1)
+        kjobkill = 0;
       if (exit == 0)
         fprintf(stderr, "\nExitted normally with exit status: %d\n", exit);
       else
@@ -123,52 +123,57 @@ void done()
       fflush(stdout);
       del_process(p);
     }
-
   }
-    if(overkillflag==1)
+  if (overkillflag == 1)
     del_process(-1);
 }
 
-void ctrl_c(int signo)
-{
-    pid_t p = getpid();
+// void ctrl_c(int signo)
+// {
+//   pid_t p = getpid();
+//   if (p != myid)
+//     return;
 
-    printf("myid = %d\nchildid = %d\n",p, current_fore.pid);
-    if (p != myid)
-        return;
-    printf("next step\n");
-    if (current_fore.pid != -1)
-    {
-      printf("Killing\n");
-      kill(current_fore.pid, SIGINT);
-    }
-    signal(SIGINT, ctrl_c);
-}
+//   if (p == myid && current_fore.pid == -1)
+//   {
+//     promptprint();
+//     fflush(stdout);
+//   }
+//   // printf("next step\n");
+//   if (current_fore.pid != -1)
+//   {
+//     // printf("Killing\n");
+//     kill(current_fore.pid, SIGINT);
+//   }
+//   signal(SIGINT, ctrl_c);
+// }
 
 void ctrl_z(int signo)
 {
-    printf("ININININI\n");
-    pid_t p = getpid();
-    if (p != myid)
-        return;
-    printf("in z - %d\n",current_fore.pid);
-    if (current_fore.pid != -1)
-    {
-        kill(current_fore.pid, SIGTTIN);
-         printf("next\n");
-        kill(current_fore.pid, SIGTSTP);
-        job_count++;
-        job_arr[job_count].pid=current_fore.pid;
-        strcpy(job_arr[job_count].name,current_fore.name);
-        // return;        
-    }
-    signal(SIGTSTP, ctrl_z);
-    fflush(stdout);
+  pid_t p = getpid();
+  if (p != myid)
     return;
+  // printf("in z - %d\n", current_fore.pid);
+  if (current_fore.pid != -1)
+  {
+    kill(current_fore.pid, SIGTTIN);
+    kill(current_fore.pid, SIGTSTP);
+    job_count++;
+    job_arr[job_count].pid = current_fore.pid;
+    strcpy(job_arr[job_count].name, current_fore.name);
+    return;
+  }
+  signal(SIGTSTP, ctrl_z);
+  if (p == myid)
+  {
+    promptprint();
+    fflush(stdout);
+  }
+
+  return;
 }
 
 // ****************************************** MAIN LOOP ***********************************************************//
-
 
 void loop(void)
 {
@@ -178,24 +183,25 @@ void loop(void)
   int status = 1; //status of the executed command
   char ogcom[10000];
 
-
-
   do
   {
     redflag = 0;
-    current_fore.pid=-1;
+    current_fore.pid = -1;
     //********************************************* SIGNALS ***********************************************
     signal(SIGCHLD, done);
-    signal(SIGINT, ctrl_c);
+    // signal(SIGINT, ctrl_c);
     signal(SIGTSTP, ctrl_z);
 
     // *********************************** DISPLAYING THE PROMPT  ***********************************************
 
+    // printf("Printing from loop\n");
     promptprint();
 
     //*************************************************** COMMANDS ************************************************
 
     getline(&command, &size, stdin);
+
+    // printf("COMMAND %s\n", command);
 
     list_com[0] = strtok(command, ";\n"); //separating the commands
     ll i = 0;
@@ -211,7 +217,7 @@ void loop(void)
 
       getcwd(cwd, sizeof(cwd));
 
-      if (pipecheck(list_com[j]))                       //**************************CHECK *************************************//
+      if (pipecheck(list_com[j])) //**************************CHECK *************************************//
       {
         temp[0] = strtok(list_com[j], "|");
         ll k = 0;
@@ -220,7 +226,7 @@ void loop(void)
           k++;
           temp[k] = strtok(NULL, "|");
         }
-        piping(temp,k);
+        piping(temp, k);
       }
 
       else
@@ -238,19 +244,19 @@ void loop(void)
         {
           // printf("TOKEN[i]= %s\n",token[i]);
 
-          for(ll i=0; token[j][i]; i++)
-          if ((token[j][i]=='>')|| token[j][i]=='<' || (token[j][i]=='>' && token[j][i+1]=='>') && redflag == 0)
-              {
-                redflag = 1;
-                if(token[j][i]=='>' && token[j][i+1]=='>')
-                  i++;
-              }
-          else if ((token[j][i]=='>')|| token[j][i]=='<' || (token[j][i]=='>' && token[j][i+1]=='>') && redflag == 1)
-              {
-                redflag = 2;
-                if(token[j][i]=='>' && token[j][i+1]=='>')
-                  i++;
-              }
+          for (ll i = 0; token[j][i]; i++)
+            if ((token[j][i] == '>') || token[j][i] == '<' || (token[j][i] == '>' && token[j][i + 1] == '>') && redflag == 0)
+            {
+              redflag = 1;
+              if (token[j][i] == '>' && token[j][i + 1] == '>')
+                i++;
+            }
+            else if ((token[j][i] == '>') || token[j][i] == '<' || (token[j][i] == '>' && token[j][i + 1] == '>') && redflag == 1)
+            {
+              redflag = 2;
+              if (token[j][i] == '>' && token[j][i + 1] == '>')
+                i++;
+            }
         }
 
         if (strcmp(token[0], "history") != 0) //WRITING INTO HISTORY
@@ -274,6 +280,7 @@ void loop(void)
 
         else if (strcmp(token[0], "quit") == 0) //EXIT
         {
+          overkill();
           FILE *fd2;
           fd2 = fopen("his.txt", "w");
 
@@ -289,7 +296,7 @@ void loop(void)
           pwd();
         else if (strcmp(token[0], "cd") == 0) //COMMAND : CD
         {
-          cd(token,k);
+          cd(token, k);
         }
         else if (strcmp(token[0], "echo") == 0) //COMMAND : ECHO
         {
@@ -309,24 +316,23 @@ void loop(void)
           history_print();
           his_check(token[0]);
         }
-        else if(strcmp(token[0],"jobs")==0)       //JOBS
+        else if (strcmp(token[0], "jobs") == 0) //JOBS
           alljobs();
-        else if(strcmp(token[0],"kjob")==0)       //KJOBS
-          kjob(token,k);
-        else if(strcmp(token[0],"bg")==0)         //BG
-          bg(token);  
-        else if(strcmp(token[0],"fg")==0)         //FG
+        else if (strcmp(token[0], "kjob") == 0) //KJOBS
+          kjob(token, k);
+        else if (strcmp(token[0], "bg") == 0) //BG
+          bg(token);
+        else if (strcmp(token[0], "fg") == 0) //FG
           fg(token);
-        else if(strcmp(token[0],"overkill")==0)   //OVERKILL
+        else if (strcmp(token[0], "overkill") == 0) //OVERKILL
           overkill();
-        else if(strcmp(token[0],"setenv")==0)
-          settingenv(token,k);
-        else if(strcmp(token[0],"unsetenv")==0)
-          unsettingenv(token,k);
+        else if (strcmp(token[0], "setenv") == 0)
+          settingenv(token, k);
+        else if (strcmp(token[0], "unsetenv") == 0)
+          unsettingenv(token, k);
         else
           // printf("myshell: command not found: %s\n", token[0]);
           fore(token);
-        
       }
     }
 
@@ -335,8 +341,8 @@ void loop(void)
 
 int main(int argc, char const *argv[])
 {
-  myid=getpid();
-  // printf("ORIGINAL SHELL ID= %lld\n",myid);
+  myid = getpid();
+  // printf("ORIGINAL SHELL ID= %lld\n", myid);
 
   char old_his[100000];
   ssize_t his_size = 100000;
@@ -389,10 +395,10 @@ int main(int argc, char const *argv[])
   int pos = 0, sl;
   child_flag = 0;
   curid = -1;
-  job_count=0;
-  kjobkill=0;
-  overkillflag=0;
-  pipingflag=0;
+  job_count = 0;
+  kjobkill = 0;
+  overkillflag = 0;
+  pipingflag = 0;
 
   getcwd(currentdir, sizeof(currentdir));
   // printf("%s\n", currentdir);

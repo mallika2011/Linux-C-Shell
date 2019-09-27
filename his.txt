@@ -1,8 +1,10 @@
-emcas
-emacs
-fg
-exit
+vim
+jobs
 quit
+
+
+
+
 
 
 

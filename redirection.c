@@ -4,6 +4,7 @@ int status;
 
 void choice(int fds[], char *from[], int k, int oldin, int oldout)
 {
+    // printf("*****CAME INTO CHOICE *****\n");
 
     if (strcmp(from[k - 1], "&") == 0) // FOR BACKGROUND PROCESSES
     {
@@ -144,6 +145,7 @@ void both(char com[], ll app)
 
         if (pid == 0)
         {
+            // printf("Going to choice\n");
             choice(fds,from,k,-1,oldout);
             // printf("did choice\n");
             // dup2(oldout, 1);
@@ -200,6 +202,7 @@ void both(char com[], ll app)
 
 void redirection(char *token[], ll k, char list_com[], int redflag)
 {
+    // printf("LIST OF COMMS = %s\n", list_com);
     ll app = 0, inp = 0, out = 0, a = 0;
     for (ll i = 0; i < k; i++)
     {
