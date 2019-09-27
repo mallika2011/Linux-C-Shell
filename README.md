@@ -52,6 +52,73 @@ The commands that are supported are as follows :
     emacs &
     ```
 
+* Input output redirection : Redirects input or output to appropriate files. Example:
+
+  * ```bash
+    cat file1.txt > file2.txt
+    sort < sort.txt > sorted.txt
+    ```
+
+* Piping commands : Pipes two or more commands together. Example:
+
+  * ```bash
+    cat test.txt | grep a
+    ```
+
+* Piping with redirection : Example :
+
+  * ```bash
+    sort < sort.txt  | grep a | wc > lines.txt
+    ```
+
+* setenv : setting new environment variables. Example :
+
+  * ```bash
+    setenv a 15
+    ```
+
+* unsetenv : unsetting an environment variable
+
+  * ```bash
+    unsetenv a
+    ```
+
+* jobs : prints all the  background jobs
+
+  * ```bash
+    jobs
+    ```
+
+* kjob : Sends a signal to  a particular job number
+
+  * ```bash
+    kjob 1 9
+    ```
+
+* fg : brings a running or a stopped background job with given job number to foreground.
+
+  * ```bash
+    fg 1
+    ```
+
+* bg : changes a stopped background job to a running background job.
+
+  * ```bash
+    bg 1
+    ```
+
+* overkill : kills all background process at once.
+
+  * ```bash
+    overkill
+    ```
+
+* The terminal also supports
+
+  * CTRL + Z
+
+  * CTRL + C
+
 ## Running the Shell
 
 In order to run the shell run the following command.
@@ -66,7 +133,7 @@ In order to run the shell run the following command.
 To exit from the shell, use the command
 
 ```bash
-exit
+quit
 ```
 
 ## Pseudo Home

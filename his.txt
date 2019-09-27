@@ -1,6 +1,7 @@
-vim
-jobs
+[A
 quit
+
+
 
 
 
