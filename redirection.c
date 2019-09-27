@@ -4,8 +4,6 @@ int status;
 
 void choice(int fds[], char *from[], int k, int oldin, int oldout)
 {
-    // printf("*****CAME INTO CHOICE *****\n");
-
     if (strcmp(from[k - 1], "&") == 0) // FOR BACKGROUND PROCESSES
     {
         from[k - 1] = NULL;
@@ -110,9 +108,7 @@ void both(char com[], ll app)
         // printf("came into input\n");
         int oldin = dup(STDIN_FILENO);
         int pid = fork();
-
         fds[0] = open(input_file, O_RDONLY);
-        // printf("fd val = %d\n", fds[0]);
         if (fds[0] < 0)
             perror("File doesn't exist\n");
         if (pid == 0)
@@ -202,7 +198,6 @@ void both(char com[], ll app)
 
 void redirection(char *token[], ll k, char list_com[], int redflag)
 {
-    // printf("LIST OF COMMS = %s\n", list_com);
     ll app = 0, inp = 0, out = 0, a = 0;
     for (ll i = 0; i < k; i++)
     {

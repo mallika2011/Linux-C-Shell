@@ -12,9 +12,7 @@ void fore(char **token)
         perror("Error: Fork Failed\n");
     else if (pid == 0)
     {
-        // printf("%s %s\n", token[0], token[1]);
         int f = execvp(token[0], token);
-        // printf("f= %d\n",f);
         if (f < 0)
         {
             perror("Error: exec failed\n");
@@ -26,6 +24,5 @@ void fore(char **token)
     {
         int status;
         waitpid(pid,&status,WUNTRACED);
-        // printf("before %d\n",childid);
     }
 }

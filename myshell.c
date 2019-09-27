@@ -15,8 +15,6 @@ void promptprint()
 
   getcwd(cwd, sizeof(cwd));
   strcpy(prompt, "");
-
-  // printf("cwd= %s\n",cwd);
   if (strcmp(cwd, pseudo_home) == 0)
     strcpy(dir, "~");
   else
@@ -31,14 +29,12 @@ void promptprint()
         break;
       }
     }
-    // printf("Not equal at %d\n",x);
     if (x == 0)
     {
       dir[0] = '~';
       ll p, j;
       for (p = 1, j = ii; cwd[j]; p++, j++)
       {
-        // printf("%c",cwd[j]);
         dir[p] = cwd[j];
       }
       dir[p] = '\0';
@@ -48,7 +44,6 @@ void promptprint()
       strcpy(dir, cwd);
   }
 
-  // printf("dir = %s\n",dir);
   strcat(prompt, "<");
   strcat(prompt, username);
   strcat(prompt, " @ ");
@@ -64,7 +59,6 @@ void promptprint()
   strcat(prompt, ">");
 
   printf("\033[1;34m");
-  // printf("\033[1;36m");
 
   printf("%s ", prompt);
   printf("\033[0m");
@@ -79,7 +73,6 @@ void del_process(int id)
   else
     for (ll i = 1; i <= job_count; i++)
     {
-      // printf("loop\n");
       if (job_arr[i].pid == id)
       {
         // printf("job killed\n");
@@ -95,7 +88,6 @@ void del_process(int id)
 
 void done()
 {
-  // printf("ENTERED\n");
   pid_t p;
   int status;
   p = waitpid(-1, &status, WNOHANG);
@@ -128,32 +120,31 @@ void done()
     del_process(-1);
 }
 
-// void ctrl_c(int signo)
-// {
-//   pid_t p = getpid();
-//   if (p != myid)
-//     return;
+void ctrl_c(int signo)
+{
+  pid_t p = getpid();
+  if (p != myid)
+    return;
 
-//   if (p == myid && current_fore.pid == -1)
-//   {
-//     promptprint();
-//     fflush(stdout);
-//   }
-//   // printf("next step\n");
-//   if (current_fore.pid != -1)
-//   {
-//     // printf("Killing\n");
-//     kill(current_fore.pid, SIGINT);
-//   }
-//   signal(SIGINT, ctrl_c);
-// }
+  if (p == myid && current_fore.pid == -1)
+  {
+    promptprint();
+    fflush(stdout);
+  }
+  // printf("next step\n");
+  if (current_fore.pid != -1)
+  {
+    // printf("Killing\n");
+    kill(current_fore.pid, SIGINT);
+  }
+  signal(SIGINT, ctrl_c);
+}
 
 void ctrl_z(int signo)
 {
   pid_t p = getpid();
   if (p != myid)
     return;
-  // printf("in z - %d\n", current_fore.pid);
   if (current_fore.pid != -1)
   {
     kill(current_fore.pid, SIGTTIN);
@@ -189,19 +180,17 @@ void loop(void)
     current_fore.pid = -1;
     //********************************************* SIGNALS ***********************************************
     signal(SIGCHLD, done);
-    // signal(SIGINT, ctrl_c);
+    signal(SIGINT, ctrl_c);
     signal(SIGTSTP, ctrl_z);
 
     // *********************************** DISPLAYING THE PROMPT  ***********************************************
 
-    // printf("Printing from loop\n");
     promptprint();
 
     //*************************************************** COMMANDS ************************************************
 
     getline(&command, &size, stdin);
 
-    // printf("COMMAND %s\n", command);
 
     list_com[0] = strtok(command, ";\n"); //separating the commands
     ll i = 0;
@@ -242,8 +231,6 @@ void loop(void)
         // printf("Numner of tokens = %lld\n",k);
         for (ll j = 0; j < k; j++)
         {
-          // printf("TOKEN[i]= %s\n",token[i]);
-
           for (ll i = 0; token[j][i]; i++)
             if ((token[j][i] == '>') || token[j][i] == '<' || (token[j][i] == '>' && token[j][i + 1] == '>') && redflag == 0)
             {
@@ -268,7 +255,6 @@ void loop(void)
 
         if (strcmp(token[k - 1], "&") == 0) // FOR BACKGROUND PROCESSES
         {
-          // printf("entered back\n");
           token[k - 1] = NULL;
           back(token);
         }
@@ -339,11 +325,11 @@ void loop(void)
   } while (status);
 }
 
+//************************************************* MAIN *******************************************
+
 int main(int argc, char const *argv[])
 {
   myid = getpid();
-  // printf("ORIGINAL SHELL ID= %lld\n", myid);
-
   char old_his[100000];
   ssize_t his_size = 100000;
   int line = 0, cnt = 0, t = 0;
@@ -358,9 +344,6 @@ int main(int argc, char const *argv[])
   while (fgets(old_his, sizeof(old_his), fd))
     line++;
   fseek(fd, 0, SEEK_SET);
-
-  // printf("count= %d\nline= %d\nhsize=%d\n", cnt, line, hsize);
-
   if (line >= hsize)
   {
     line = line - hsize;
@@ -385,7 +368,6 @@ int main(int argc, char const *argv[])
   }
   l = 0;
   r = t - 1;
-  // printf("History l=%d   r=%d\n", l, r);
   his_load(l, r);
   fclose(fd);
 

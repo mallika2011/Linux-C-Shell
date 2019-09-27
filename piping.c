@@ -14,9 +14,10 @@ int pipecheck(char com[])
     return flag;
 }
 
+//***************************************************************************************************************
+
 int redirection_check(char ogcom[])
 {
-    // printf("checking on %s\n", ogcom);
     char *token[100000];
     token[0] = strtok(ogcom, " \t\r\n");
     ll k = 0, r;
@@ -28,8 +29,6 @@ int redirection_check(char ogcom[])
     }
     for (ll j = 0; j < k; j++)
     {
-        // printf("TOKEN[i]= %s\n",token[i]);
-
         for (ll i = 0; token[j][i]; i++)
             if ((token[j][i] == '>') || token[j][i] == '<' || (token[j][i] == '>' && token[j][i + 1] == '>') && r == 0)
             {
@@ -71,7 +70,7 @@ void piping(char *commands[], ll k)
         // printf("*%lld. -%s-\n", i, commands[i]);
         // printf("tokens = \n");
         // for (ll j = 0; j < ii; j++)
-        //     printf("%lld. -%s-\n", j, part[j]);
+        // printf("%lld. -%s-\n", j, part[j]);
 
         if (i % 2 != 0)
         {
@@ -91,13 +90,9 @@ void piping(char *commands[], ll k)
         {
             if (i == 0)
             {
-                // printf("came into 0\n");
                 dup2(mypipe[1], 1); // output to pipe
                 close(mypipe[0]);   //closing input end of pipe
                 strcpy(temp, commands[i]);
-                // r = redirection_check(temp);
-                // if (r == 1 || r == 2)
-                //     redirection(part, ii, commands[i], r);
             }
             else if (i == k - 1)
             {
@@ -111,11 +106,7 @@ void piping(char *commands[], ll k)
                     // printf("came into even end\n");
                     dup2(mypipe2[0], 0); //input from transit
                 }
-                // strcpy(temp, commands[i]);
-                // r = redirection_check(temp);
 
-                // if (r == 1 || r == 2)
-                //     redirection(part, ii, commands[i], r);
             }
 
             else if (i % 2 == 0)
@@ -145,9 +136,11 @@ void piping(char *commands[], ll k)
             else
             {
                 int z = execvp(part[0], part); // exec
-                // printf("faiiill\n");
                 if (z < 0)
                     perror("Error: command not found\n");
+                    
+                if(r==0)
+                    exit(0);
             }
             exit(0);
         }
