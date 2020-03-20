@@ -2,7 +2,7 @@
 
 ## Brief Overview
 
-This shell is a basic version of a linux shell. It supports semicolon separated commands. Foreground and Background processes can also be executed.
+This shell is a complete working linux shell. It supports most linux shell functionalities including semicolon separated commands, piping, redirection, all basic linux commands etc. Foreground and Background processes can also be executed.
 The commands that are supported are as follows :
 
 * pwd : prints the present working directory.
