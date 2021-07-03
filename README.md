@@ -1,5 +1,12 @@
 # LINUX SHELL : MYSHELL
 
+## Running the Shell
+
+1. Clone the directory with: `git@github.com:mallika2011/Linux-C-Shell.git`
+2. `cd` into the `Linux-C-Shel` directory.
+3. Run the `make` command
+4. Run `./run` to start the shell
+5. Enter `quit` to exit the shell.
 ## Brief Overview
 
 This shell is a basic version of a linux shell. It supports semicolon separated commands. Foreground and Background processes can also be executed.
